@@ -1,8 +1,10 @@
 import requests
 import time
 
-BOT_TOKEN = "51205423:Y8rb0kJwjEGJYInrKJLLLh1yCzBKP32dLqI"
-CHANNEL_ID = "4315994987"
+bale_BOT_TOKEN = "51205423:Y8rb0kJwjEGJYInrKJLLLh1yCzBKP32dLqI"
+bale_CHANNEL_ID = "4315994987"
+telegram_BOT_TOKEN = "8824001694:AAHmsfRoFl_QE2I_VR6dfO9OED6ydtxFX_Y"
+telegram_CHANNEL_ID = "-1003824337954"
 
 LAST_PRICE = None
 
@@ -23,10 +25,12 @@ def get_btc_price():
 
 
 def send_message(text):
-    url = f"https://tapi.bale.ai/{BOT_TOKEN}/sendMessage"
-    #url = f"https://tapi.bale.ai/{BOT_TOKEN}/getUpdates"
-    payload = {
-        "chat_id": CHANNEL_ID,
+    bale_url = f"https://tapi.bale.ai/{bale_BOT_TOKEN}/sendMessage"
+    telegram_url = f"https://api.telegram.org/bot{telegram_BOT_TOKEN}/sendMessage"
+
+    #for Bale
+    bale_payload = {
+        "chat_id": bale_CHANNEL_ID,
         "text": text,
         "reply_markup": {
             "inline_keyboard": [
@@ -44,7 +48,28 @@ def send_message(text):
             ]
         }
     }
-    requests.post(url, json=payload, timeout=10)
+    #for Telegram
+    telegram_payload = {
+        "chat_id": telegram_CHANNEL_ID,
+        "text": text,
+        "reply_markup": {
+            "inline_keyboard": [
+                [
+                    {
+                        "text": "📈 چارت بیت کوین",
+                        "url": "https://www.tradingview.com/chart/?symbol=BINANCE:BTCUSDT"
+                    },
+                    {
+                        "text": "🥇 چارت انس جهانی طلا",
+                        "url": "https://www.tradingview.com/chart/yEiQgDpV/?symbol=TVC%3AGOLD"
+
+                    }
+                ]
+            ]
+        }
+    }
+    requests.post(bale_url, json=bale_payload, timeout=10)
+    requests.post(telegram_url, json=telegram_payload , timeout = 10)
     #print("status:", r.status_code)
     #print("response:", r.text)
 
