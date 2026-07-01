@@ -40,7 +40,7 @@ def send_message(text):
                         "url": "https://www.tradingview.com/chart/?symbol=BINANCE:BTCUSDT"
                     },
                     {
-                        "text": "🥇 چارت انس جهانی طلا",
+                        "text": "🥇 چارت طلا",
                         "url": "https://www.tradingview.com/chart/yEiQgDpV/?symbol=TVC%3AGOLD"
 
                     }
