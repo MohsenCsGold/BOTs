@@ -1,8 +1,14 @@
 import requests
+from datetime import datetime , time as dt_time
 import time
+import jdatetime
+
 
 bale_BOT_TOKEN = "51205423:Y8rb0kJwjEGJYInrKJLLLh1yCzBKP32dLqI"
+# Bitcoin and Gold Live price
 bale_CHANNEL_ID = "4315994987"
+#Daily Today Message
+bale_Emruz_CHANNEL_ID = "5774042077"
 telegram_BOT_TOKEN = "8824001694:AAHmsfRoFl_QE2I_VR6dfO9OED6ydtxFX_Y"
 telegram_CHANNEL_ID = "-1003824337954"
 
@@ -69,24 +75,48 @@ def send_message(text):
         }
     }
     requests.post(bale_url, json=bale_payload, timeout=10)
-    requests.post(telegram_url, json=telegram_payload , timeout = 10)
+    #requests.post(telegram_url, json=telegram_payload , timeout = 10)
     #print("status:", r.status_code)
     #print("response:", r.text)
 
+def send_daily_message(msg):
+    bale_url = f"https://tapi.bale.ai/{bale_BOT_TOKEN}/sendMessage"
+
+    #for Bale
+    bale_emruz_payload = {
+        "chat_id": bale_Emruz_CHANNEL_ID,
+        "text": msg,
+        "reply_markup": {
+            "inline_keyboard": [
+                [
+                    {
+                        "text": "مشاهده تقویم",
+                        "url": "https://time.ir"
+                    }
+                ]
+            ]
+        }
+    }
+    requests.post(bale_url, json=bale_emruz_payload, timeout=10)
 
 
+def persianWeekDay(dayofweek):
+    WEEK_DAYS = {
+    0: "دوشنبه",
+    1: "سه‌شنبه",
+    2: "چهارشنبه",
+    3: "پنجشنبه",
+    4: "جمعه",
+    5: "شنبه",
+    6: "یکشنبه"
+    }
+    return WEEK_DAYS[dayofweek]
+dayPrinted = False
 while True:
     try:
         gold_price = get_gold_price()
         btc_price = get_btc_price()
-
-        #if price != LAST_PRICE:
-        #    msg = (
-        #        "🟡 انس جهانی طلا (XAU/USD)\n\n"
-        #        f"💰 {price:,.2f} USD\n\n"
-        #        f"⏰ {time.strftime('%Y-%m-%d %H:%M:%S')}"
-        #    )
-
+        theDay = datetime.now()
         msg = (
             "GOLD: "
             f"{gold_price:,.2f} | BTC: "
@@ -96,7 +126,16 @@ while True:
 
         send_message(msg)
         print (msg)
-        #LAST_PRICE = price
+
+        # Emruz Channel
+        if theDay.hour ==0 and theDay.minute == 5:
+            #send_daily_message(msg)
+            print (theDay.time())
+            msg = persianWeekDay(theDay.weekday()) + jdatetime.datetime.now().strftime(" %d-%m-%Y ")
+            send_daily_message(msg)
+            print(msg)
+            dayPrinted = True
+
         time.sleep(60)
     except Exception as e:
         print(e)
