@@ -1,5 +1,5 @@
 import requests
-from datetime import datetime , time as dt_time
+from datetime import datetime , time as dt_time , timedelta
 import time
 import jdatetime
 
@@ -9,11 +9,14 @@ bale_BOT_TOKEN = "51205423:Y8rb0kJwjEGJYInrKJLLLh1yCzBKP32dLqI"
 bale_CHANNEL_ID = "4315994987"
 #Daily Today Message
 bale_Emruz_CHANNEL_ID = "5774042077"
+
 telegram_BOT_TOKEN = "8824001694:AAHmsfRoFl_QE2I_VR6dfO9OED6ydtxFX_Y"
 telegram_CHANNEL_ID = "-1003824337954"
 
 LAST_PRICE = None
-
+dayPrinted = False
+today = datetime.now() - timedelta(days = 1)
+isFirstTime = True
 
 def get_gold_price():
      # url = "https://www.gold-api.com/price/XAU"
@@ -28,7 +31,6 @@ def get_btc_price():
     r = requests.get(url_btc, timeout=10)
     data = r.json()
     return data["price"]
-
 
 def send_message(text):
     bale_url = f"https://tapi.bale.ai/{bale_BOT_TOKEN}/sendMessage"
@@ -111,9 +113,11 @@ def persianWeekDay(dayofweek):
     6: "یکشنبه"
     }
     return WEEK_DAYS[dayofweek]
-dayPrinted = False
 while True:
     try:
+        ##############################
+        # Gold Price Channel
+        ##############################
         gold_price = get_gold_price()
         btc_price = get_btc_price()
         theDay = datetime.now()
@@ -127,15 +131,18 @@ while True:
         send_message(msg)
         print (msg)
 
+        ##############################
         # Emruz Channel
-        if theDay.hour ==0 and theDay.minute == 5:
-            #send_daily_message(msg)
+        ##############################
+        if today.date() != datetime.now().date():
+            dayPrinted = False
+            today = datetime.now()
+        if not dayPrinted  :
             print (theDay.time())
             msg = persianWeekDay(theDay.weekday()) + jdatetime.datetime.now().strftime(" %d-%m-%Y ")
             send_daily_message(msg)
             print(msg)
             dayPrinted = True
-
         time.sleep(60)
     except Exception as e:
         print(e)
